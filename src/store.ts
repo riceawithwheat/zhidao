@@ -81,11 +81,6 @@ const asyncAndCommit = async (url: string, mutationName:string,
   }
   return data
 }
-// const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
-//   const { data } = await axios.get(url)
-//   commit(mutationName, data)
-//   return data
-// }
 const postAndCommit = async (url: string, mutationName: string, commit: Commit, payload?: any) => {
   console.log(url)
   const data = await axios.post(url, payload,
@@ -108,12 +103,9 @@ const store = createStore<GlobalDataProps>({
     // loadedColumns: [],
     //  isLogin: false
     user: JSON.parse(localStorage.getItem('user')) || { isLogin: false }
+    // user: { isLogin: false }
   },
   mutations: {
-    // 测试用登录
-    // login (state) {
-    //   state.user = { ...state.user, isLogin: true, name: 'viking' }
-    // },
     createPost (state, newPost) {
       console.log(newPost)
       state.posts.data[newPost.id] = newPost
@@ -140,7 +132,6 @@ const store = createStore<GlobalDataProps>({
     },
     // 获取全部文章
     fetchAllPost (state, rawData) {
-      console.log('我在获取文章解析模块')
       const records = rawData.data.data.records
       state.posts.data = { ...state.posts.data, ...records }
       // console.log(state.posts.data)
@@ -148,7 +139,6 @@ const store = createStore<GlobalDataProps>({
       // state.posts.loadedColumns.push(loadedId)
     },
     fetchmyPosts (state, rawData) {
-      console.log('我在我的文章解析模块')
       const records = rawData.data.data.records
       state.posts.myPosts = { ...records }
       console.log(state.posts.myPosts)
@@ -245,7 +235,6 @@ const store = createStore<GlobalDataProps>({
       }
     },
     fetchAllPost ({ commit }) {
-      console.log('我在全部文章')
       const payload = {
         current: '1',
         size: '5'
@@ -271,7 +260,6 @@ const store = createStore<GlobalDataProps>({
     },
     // 跳转到上传文件表单
     createPost ({ commit }, payload) {
-      console.log('我在上传文件')
       console.log(payload)
       return postAndCommit('/essay/addOrUpdate/essay', 'createPost', commit, payload)
     },
@@ -318,5 +306,13 @@ const store = createStore<GlobalDataProps>({
   },
   modules: {},
   plugins: [persistedState({ storage: window.sessionStorage })]
+})
+// 在应用初始化时，从 Local Storage 恢复状态
+const storedState = JSON.parse(localStorage.getItem('vuex-state') || '{}')
+store.replaceState({ ...store.state, ...storedState })
+
+// 在页面刷新前，将状态存储到 Local Storage
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('vuex-state', JSON.stringify(store.state))
 })
 export default store
