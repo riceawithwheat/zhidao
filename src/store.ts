@@ -197,6 +197,7 @@ const store = createStore<GlobalDataProps>({
     logout (state) {
       state.token = ' '
       state.user = { isLogin: false }
+      state.columns = { data: {}, current: '0', total: 0 }
       localStorage.removeItem('token')
       delete axios.defaults.headers.token
     }

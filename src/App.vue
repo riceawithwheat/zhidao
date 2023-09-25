@@ -1,7 +1,7 @@
 <template>
   <global-header :user="currentUser"></global-header>
 
-    <loader v-if="isLoading" background="rgba(0,0,0,0.8 )" ></loader>
+    <!-- <loader v-if="isLoading" background="rgba(0,0,0,0.8 )" ></loader> -->
     <router-view></router-view>
   <div class="container-fluid">
   <footer class="text-center py-4 text-secondary  mt-6 ">
@@ -29,8 +29,8 @@ import createMessage from './components/createMessage'
 export default defineComponent({
   name: 'App',
   components: {
-    GlobalHeader,
-    Loader
+    GlobalHeader
+    // Loader
   },
   setup () {
     const store = useStore<GlobalDataProps>()
