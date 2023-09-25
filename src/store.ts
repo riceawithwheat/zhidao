@@ -1,6 +1,7 @@
 /* eslint-disable indent */
 import { createStore, Commit } from 'vuex'
 import axios, { AxiosRequestConfig } from 'axios'
+import persistedState from 'vuex-persistedstate'
 
 export interface ImageProps {
   id?: string;
@@ -106,7 +107,7 @@ const store = createStore<GlobalDataProps>({
     posts: { data: {}, myPosts: {} },
     // loadedColumns: [],
     //  isLogin: false
-    user: { isLogin: false }
+    user: JSON.parse(localStorage.getItem('user')) || { isLogin: false }
   },
   mutations: {
     // 测试用登录
@@ -134,6 +135,7 @@ const store = createStore<GlobalDataProps>({
         total: Array.from(data).length,
         current: '1'
       }
+      console.log('text')
       // console.log(Array.from(data))
     },
     // 获取全部文章
@@ -179,6 +181,7 @@ const store = createStore<GlobalDataProps>({
     },
     // 登录之后操作
     fetchCurrentUser (state, rawData) {
+      localStorage.setItem('user', JSON.stringify(rawData.data))
       state.user = { isLogin: false }
       const { data } = rawData.data
       if (rawData.data.data) {
@@ -190,6 +193,7 @@ const store = createStore<GlobalDataProps>({
       console.log(state.user)
     },
     login (state, rawData) {
+      state.loading = false
       const token = rawData.data.data
       console.log('login')
       console.log(rawData)
@@ -311,6 +315,8 @@ const store = createStore<GlobalDataProps>({
       console.log(data)
       return data
     }
-  }
+  },
+  modules: {},
+  plugins: [persistedState({ storage: window.sessionStorage })]
 })
 export default store
