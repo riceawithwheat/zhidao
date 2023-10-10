@@ -1,5 +1,5 @@
 {
-  "name": "maimai",
+  "name": "learnMore",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,9 +13,12 @@
     "core-js": "^3.8.3",
     "easymde": "^2.18.0",
     "mitt": "^3.0.0",
+    "sass": "^1.69.1",
+    "sass-loader": "^13.3.2",
     "vue": "^3.2.13",
     "vue-router": "^4.1.6",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0",
