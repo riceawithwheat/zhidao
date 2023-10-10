@@ -1,6 +1,8 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-    <div class="home-page container">
+    <div class="home-page container mt-2">
+      <weather-view></weather-view>
+
       <TechComponent
       title="Cutting-Edge Technologies"
       description="Explore the latest advancements in the tech world."
@@ -37,13 +39,15 @@ import { useStore } from 'vuex'
 import useLoadMore from '../hooks/useLoadMore'
 import ColumnList from '../components/ColumnList.vue'
 import TechComponent from '@/components/TechComponent.vue'
+import weatherView from '../components/weatherView.vue'
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Home',
   components: {
     ColumnList,
-    TechComponent
+    TechComponent,
+    weatherView
   },
   setup () {
     const store = useStore<GlobalDataProps>()
@@ -68,4 +72,5 @@ export default defineComponent({
   background-image: linear-gradient(45deg, #0099FF, #0c69d2);
 
 }
+
 </style>
