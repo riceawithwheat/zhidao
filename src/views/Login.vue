@@ -64,7 +64,7 @@ export default defineComponent({
         }
 
         store.dispatch('loginAndFetch', payload).then(data => {
-          if (data.status === 200) {
+          if (data.data.code === 200) {
             createMessage('登录成功 2秒后跳转首页', 'success', 1000)
             store.commit('setLogin', true)
             store.dispatch('fetchColumn').then(rawdata => {

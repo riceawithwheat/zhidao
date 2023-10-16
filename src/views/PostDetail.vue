@@ -9,7 +9,7 @@
         <article class="w-75 mx-auto mb-5 pb-3" v-if="currentPost">
           <!-- <pre>{{ currentPost[0] }}</pre> -->
         <img :src="currentImageUrl" alt="currentPost.title" class="rounded-lg img-fluid my-4" v-if="currentImageUrl">
-        <h2 class="mb-4">12374{{ currentPost[0].title }}</h2>
+        <h2 class="mb-4">{{ currentPost[0].title }}</h2>
         <div class="user-profile-component border-top border-bottom py-3">
             <div class="col">
                 <user-profile :user="currentPost[0].authorId"
@@ -35,9 +35,10 @@ import UserProfile from '../components/UserProfile.vue'
 import Modal from '@/components/Modal.vue'
 import createMessage from '../components/createMessage'
 import { useStore } from 'vuex'
-import { GlobalDataProps, PostProps, ResponseType } from '../store'
+import { GlobalDataProps, PostProps } from '../store'
 import { useRouter, useRoute } from 'vue-router'
 import { marked } from 'marked'
+import axios from 'axios'
 export default defineComponent({
   name: 'post-detail',
   components: {
@@ -91,12 +92,19 @@ export default defineComponent({
     })
     const hideAndDelete = () => {
       modalIsVisible.value = false
-      store.dispatch('deletePost', currentId).then((rawData: ResponseType<PostProps>) => {
+      console.log(currentId)
+      const id = currentId
+      console.log(id)
+      // eslint-disable-next-line no-template-curly-in-string
+      axios.post(`/essay/del/essay?id=${id}`).then((rawData) => {
+        store.commit('deletePost', { id })
         createMessage('删除成功，2秒后跳转到专栏', 'success', 2000)
         setTimeout(() => {
           // 加了一个toNumber()
-          router.push({ name: 'column', params: { id: rawData.data.columnId } })
-        })
+          store.dispatch('fetchAllPost')
+          console.log(store.state.posts)
+          router.push({ name: 'column', params: { id: store.state.user.columnId } })
+        }, 2000)
       })
     }
     return {

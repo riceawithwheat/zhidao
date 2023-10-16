@@ -1,8 +1,9 @@
 <template>
-  <div class="create-post-page">
-      <h4>{{ isEditMode ? '编辑文章' : '新建文章' }}</h4>
+  <div class="create-post-page container">
+      <h4 style="font-weight: 700; font-size: 30px;">{{ isEditMode ? '编辑文章' : '新建文章' }}</h4>
       <uploader
-      action="/essay/addOrUpdate/essay"
+      action="/pic/upload"
+      category="essay"
       :beforeUpload="uploadCheck"
       :uploaded="uploadedData"
       class="d-flex align-item-center justify-content-center bg-light text-secondary w-100 my-4 ">
@@ -19,7 +20,6 @@
         <div class="uploaded-area" >
           <img :src="dataProps.uploadedData && dataProps.uploadedData"
           class="w-50 h-50"
-          id="ima"
           >
           <h3>点击重新上传</h3>
         </div>
@@ -27,20 +27,26 @@
     </uploader>
       <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
-          <label class="form-label">文章标题：</label>
+          <label class="form-label" style="font-weight: 700; font-size: larger;">文章标题：</label>
           <validate-input
           :rules="titleRules" v-model="titleVal"
           placeholder="请输入文章标题"
           type="text"></validate-input>
       </div>
       <div class="mb-3">
-          <label class="form-label">文章介绍：</label>
-          <editor :options="editorOptions"
+          <label class="form-label" style="font-weight: 700; font-size: larger;">文章简介：</label>
+          <validate-input
+          :rules="profileRules" v-model="profileVal"
+          placeholder="请输入文章简介"
+          type="text"></validate-input>
+      </div>
+      <div class="mb-5">
+          <label class="form-label" style="font-weight: 700; font-size: larger;">文章介绍：</label>
+          <wang-edr
           v-model= "contentVal"
            @blur="checkEditor"
-           :class="{'is-invalid': !editorStatus.isValid}"
-          >
-        </editor>
+           :class="{'is-invalid': !editorStatus.isValid}">
+          </wang-edr>
           <span v-if="!editorStatus.isValid" class="invalid-feedback mt-1">{{ editorStatus.message }}</span>
       </div>
       <template #submit>
@@ -54,13 +60,12 @@ import { defineComponent, ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 import { GlobalDataProps, PostProps } from '@/store'
-import { Options } from 'easymde'
 import ValidateForm from '../components/ValidateForm.vue'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import Uploader from '@/components/Uploader.vue'
 import createMessage from '@/components/createMessage'
-import Editor from '@/components/Editor.vue'
 import { beforeUploadCheck } from '@/helper'
+import wangEdr from '../components/wangEdr.vue'
 
 export default defineComponent({
   name: 'CreatePost',
@@ -68,7 +73,7 @@ export default defineComponent({
     ValidateForm,
     ValidateInput,
     Uploader,
-    Editor
+    wangEdr
   },
   props: {
     modelValue: String
@@ -83,15 +88,13 @@ export default defineComponent({
       message: ''
     })
     const isEditMode = !!route.query.id
-    // let imageId = ' '
     const titleVal = ref('')
     const upData = ref('')
-    const textArea = ref<null | HTMLTextAreaElement>(null)
     const imageUrl = ref<null | HTMLElement>(null)
-    // 配置editor的Option选项
-    const editorOptions: Options = {
-      spellChecker: false
-    }
+    const profileVal = ref('')
+    const profileRules: RulesProp = [
+      { type: 'required', message: '文章简介不能为空' }
+    ]
     const titleRules: RulesProp = [
       { type: 'required', message: '文章标题不能为空' }
     ]
@@ -118,10 +121,10 @@ export default defineComponent({
           title: titleVal.value,
           content: contentVal.value,
           url: imgUrl.src,
-          columnId: column
+          columnId: column,
+          profile: profileVal.value
         }
-        // console.log(newPost)
-        // console.log(uploadedData)
+        console.log(newPost)
         const actionName = isEditMode ? 'updatePost' : 'createPost'
         const sendData = isEditMode ? { id: route.query.id, payload: newPost } : newPost
         store.dispatch(actionName, sendData).then((data) => {
@@ -155,13 +158,13 @@ export default defineComponent({
       onFormSubmit,
       uploadedData,
       uploadCheck,
-      textArea,
       checkEditor,
       editorStatus,
-      editorOptions,
       isEditMode,
       upData,
-      imageUrl
+      imageUrl,
+      profileVal,
+      profileRules
     }
   }
 })

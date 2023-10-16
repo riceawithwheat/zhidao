@@ -1,8 +1,9 @@
 <template>
-    <div class="create-post-page">
-        <h4>{{ isEditMode ? '编辑专栏' : '新建专栏' }}</h4>
+    <div class="create-post-page container"  style="width: 800px;">
+        <h4 style="font-weight: 700; font-size: 30px;">{{ isEditMode ? '编辑专栏' : '新建专栏' }}</h4>
         <uploader
-        action="/column/add/column"
+        action="/pic/upload"
+        category="column"
         :beforeUpload="uploadCheck"
         :uploaded="uploadedData"
         class="d-flex align-item-center justify-content-center bg-light text-secondary w-100 my-4 ">
@@ -26,20 +27,20 @@
       </uploader>
         <validate-form @form-submit="onFormSubmit">
         <div class="mb-3">
-            <label class="form-label">专栏标题：</label>
+            <label class="form-label" style="font-weight: 700; font-size: 30px;">专栏标题：</label>
             <validate-input
             :rules="titleRules" v-model="titleVal"
-            placeholder="请输入文章标题"
+            placeholder="请输入专栏标题"
             type="text"></validate-input>
         </div>
         <div class="mb-3">
-            <label class="form-label">专栏介绍：</label>
-            <editor :options="editorOptions"
-            v-model= "contentVal"
-             @blur="checkEditor"
-             :class="{'is-invalid': !editorStatus.isValid}"
-            >
-          </editor>
+            <label class="form-label" style="font-weight: 700; font-size: 30px;">专栏介绍：</label>
+            <validate-input
+            :rules="contentRules" v-model="contentVal"
+            placeholder="请输入专栏介绍（200字以内）"
+            type="text"
+            style="display: inline-block !important;height: 200px !important;"
+            ></validate-input>
             <span v-if="!editorStatus.isValid" class="invalid-feedback mt-1">{{ editorStatus.message }}</span>
         </div>
         <template #submit>
@@ -53,21 +54,19 @@ import { defineComponent, ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 import { GlobalDataProps, ColumnPost } from '@/store'
-import { Options } from 'easymde'
 import ValidateForm from '../components/ValidateForm.vue'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import Uploader from '@/components/Uploader.vue'
 import { beforeUploadCheck } from '../helper'
 import createMessage from '@/components/createMessage'
-import Editor from '@/components/Editor.vue'
 
 export default defineComponent({
   name: 'createColumn',
   components: {
     ValidateForm,
     ValidateInput,
-    Uploader,
-    Editor
+    Uploader
+
   },
   props: {
     modelValue: String
@@ -82,15 +81,10 @@ export default defineComponent({
       message: ''
     })
     const isEditMode = !!route.query.id
-    // let imageId = ' '
     const titleVal = ref('')
     const upData = ref('')
     const textArea = ref<null | HTMLTextAreaElement>(null)
     const imageUrl = ref('')
-    // 配置editor的Option选项
-    const editorOptions: Options = {
-      spellChecker: false
-    }
     const titleRules: RulesProp = [
       { type: 'required', message: '专栏标题不能为空' }
     ]
@@ -116,7 +110,7 @@ export default defineComponent({
         const newColumn: ColumnPost = {
           title: titleVal.value,
           description: contentVal.value,
-          avartarUrl: imgUrl.src
+          avatarUrl: imgUrl.src
         }
         console.log(newColumn)
         const actionName = isEditMode ? 'updateColumn' : 'createColumn'
@@ -124,6 +118,8 @@ export default defineComponent({
         store.dispatch(actionName, sendData).then((data) => {
           console.log(data)
           if (data.status === 200) {
+            store.dispatch('fetchColumns')
+            store.dispatch('fetchColumn')
             createMessage('发表成功，2秒后跳转到专栏', 'success', 2000)
             console.log(sendData)
             setTimeout(() => {
@@ -155,7 +151,6 @@ export default defineComponent({
       textArea,
       checkEditor,
       editorStatus,
-      editorOptions,
       isEditMode,
       upData,
       imageUrl
