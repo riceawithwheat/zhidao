@@ -26,6 +26,7 @@ axios.interceptors.response.use(config => {
 })
 axios.defaults.baseURL = 'https://www.mmdemagic.top'
 axios.defaults.headers.post['Content-Type'] = 'multipart/form-data'
+axios.defaults.headers.token = store.state.token
 const app = createApp(App)
 app.use(router)
 app.use(store)
