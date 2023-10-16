@@ -33,6 +33,7 @@ export interface PostProps {
   columnId?: string;
   // 干啥用的？
   isHTML?: boolean;
+  profile?: string;
 }
 export interface ColumnProps {
     id: string;
@@ -45,7 +46,7 @@ export interface ColumnProps {
 export interface ColumnPost {
   file?: File;
   title: string;
-  avartarUrl?: string;
+  avatarUrl?: string;
   description: string;
 }
 interface ListProps<P> {
@@ -96,7 +97,7 @@ const postAndCommit = async (url: string, mutationName: string, commit: Commit, 
 const store = createStore<GlobalDataProps>({
   state: {
     error: { status: false },
-    token: localStorage.getItem('token') || '',
+    token: sessionStorage.getItem('token') || '',
     loading: false,
     columns: { data: {}, current: '0', total: 0 },
     posts: { data: {}, myPosts: {} },
@@ -107,31 +108,36 @@ const store = createStore<GlobalDataProps>({
   },
   mutations: {
     createPost (state, newPost) {
-      console.log(newPost)
+      // console.log(newPost)
       state.posts.data[newPost.id] = newPost
     },
     createColumn (state, newColumn) {
       state.posts.data[newColumn.id] = newColumn
     },
     fetchColumn (state, rawData) {
-      if (rawData.data.id) {
-        const { id } = rawData.data
-        state.columns.data[id] = rawData.data
+      // console.log(rawData.data.data.id)
+      if (rawData.id) {
+        const { id } = rawData.data.data.id
+        state.columns.data[id] = id
+        state.user.columnId = id
       }
+      // console.log(state.user)
     },
     fetchColumns (state, rawData) {
       const { data } = rawData.data
-      console.log(Array.from(data).length)
+      // console.log(Array.from(data).length)
       state.columns = {
         data: data,
         total: Array.from(data).length,
         current: '1'
       }
-      console.log('text')
+      console.log(state.columns)
       // console.log(Array.from(data))
     },
     // 获取全部文章
     fetchAllPost (state, rawData) {
+      console.log(state.token)
+      console.log(rawData)
       const records = rawData.data.data.records
       state.posts.data = { ...state.posts.data, ...records }
       // console.log(state.posts.data)
@@ -139,19 +145,21 @@ const store = createStore<GlobalDataProps>({
       // state.posts.loadedColumns.push(loadedId)
     },
     fetchmyPosts (state, rawData) {
+      console.log(rawData)
       const records = rawData.data.data.records
       state.posts.myPosts = { ...records }
       console.log(state.posts.myPosts)
     },
     deletePost (state, { data }) {
-      delete state.posts.data[data.id]
+      // console.log(data)
+      delete state.posts.myPosts[data]
     },
     updatePost (state, { data }) {
       console.log(state.posts.data[data.id])
       state.posts.data[data._id] = data
     },
     updateColumn (state, { data }) {
-      console.log(state.posts.data[data.id])
+      // console.log(state.posts.data[data.id])
       state.posts.data[data.id] = data
     },
     setLoading (state, status) {
@@ -163,11 +171,11 @@ const store = createStore<GlobalDataProps>({
     },
     setLogin (state, rawData) {
       state.user.isLogin = rawData
-      console.log(state.user.isLogin)
+      // console.log(state.user.isLogin)
     },
     setUserCid (state, cid) {
       state.user.columnId = cid
-      console.log(state.user.columnId)
+      // console.log(state.user.columnId)
     },
     // 登录之后操作
     fetchCurrentUser (state, rawData) {
@@ -198,32 +206,27 @@ const store = createStore<GlobalDataProps>({
       state.token = ' '
       state.user = { isLogin: false }
       state.columns = { data: {}, current: '0', total: 0 }
+      state.posts = { data: {}, myPosts: {} }
       localStorage.removeItem('token')
       delete axios.defaults.headers.token
     }
   },
   actions: {
     // get还是post请求, 获取全部专栏
-    fetchColumns ({ state, commit }, params) {
-      const { current } = params
-      console.log(params)
-      console.log(current)
-      if (current) {
-        if (state.columns.current < current) {
-          return postAndCommit('/column/get/columnList', 'fetchColumns', commit, params)
-        }
-      } else {
-        return postAndCommit('/column/get/columnList', 'fetchColumns', commit, params)
-      }
+    fetchColumns ({ commit }) {
+      return postAndCommit('/column/get/columnList', 'fetchColumns', commit)
     },
     // 获取我的专栏
     fetchColumn ({ commit }) {
         return postAndCommit('/column/get/authorColumnList', 'fetchColumn', commit)
     },
     // 获取全部该作者的全部文章
-    fetchmyPosts ({ commit }, params = {}) {
-      // const { current, size } = params
-      console.log(params)
+    fetchmyPosts ({ state, commit }) {
+      const params = {
+        current: '1',
+        size: '3'
+      }
+      console.log(state.posts.myPosts)
       return postAndCommit('/essay/get/essayListByColumn', 'fetchmyPosts', commit, params)
     },
     // 上传文章并发布，或者更新文章
@@ -262,11 +265,11 @@ const store = createStore<GlobalDataProps>({
     // 跳转到上传文件表单
     createPost ({ commit }, payload) {
       console.log(payload)
-      return postAndCommit('/essay/addOrUpdate/essay', 'createPost', commit, payload)
+      return postAndCommit('/essay/add/essay', 'createPost', commit, payload)
     },
     // 删除对应文章
     deletePost ({ commit }, id) {
-      return asyncAndCommit('/essay/del/essay', 'deletePost', commit, { method: 'delete' }, id)
+      return postAndCommit('/essay/del/essay', 'deletePost', commit, id)
     },
     // 登录
     login ({ commit }, payload) {
@@ -309,11 +312,11 @@ const store = createStore<GlobalDataProps>({
   plugins: [persistedState({ storage: window.sessionStorage })]
 })
 // 在应用初始化时，从 Local Storage 恢复状态
-const storedState = JSON.parse(localStorage.getItem('vuex-state') || '{}')
+const storedState = JSON.parse(sessionStorage.getItem('vuex-state') || '{}')
 store.replaceState({ ...store.state, ...storedState })
 
 // 在页面刷新前，将状态存储到 Local Storage
 window.addEventListener('beforeunload', () => {
-  localStorage.setItem('vuex-state', JSON.stringify(store.state))
+  sessionStorage.setItem('vuex-state', JSON.stringify(store.state))
 })
 export default store
