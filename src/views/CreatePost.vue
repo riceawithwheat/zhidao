@@ -1,12 +1,12 @@
 <template>
-  <div class="create-post-page container">
+  <div class="create-post-page container w-50">
       <h4 style="font-weight: 700; font-size: 30px;">{{ isEditMode ? '编辑文章' : '新建文章' }}</h4>
       <uploader
       action="/pic/upload"
       category="essay"
       :beforeUpload="uploadCheck"
       :uploaded="uploadedData"
-      class="d-flex align-item-center justify-content-center bg-light text-secondary w-100 my-4 ">
+      class="d-flex align-item-center justify-content-center bg-light text-secondary w-50 h-60 my-4 ">
       <h2>点击上传头图</h2>
       <template #loading>
         <div class="d-flex">
@@ -18,8 +18,7 @@
       </template>
       <template #uploaded="dataProps">
         <div class="uploaded-area" >
-          <img :src="dataProps.uploadedData && dataProps.uploadedData"
-          class="w-50 h-50"
+          <img :src="dataProps.uploadedData && dataProps.uploadedData" class="w-50 h-50"
           >
           <h3>点击重新上传</h3>
         </div>

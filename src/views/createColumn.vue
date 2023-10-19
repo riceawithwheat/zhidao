@@ -6,7 +6,7 @@
         category="column"
         :beforeUpload="uploadCheck"
         :uploaded="uploadedData"
-        class="d-flex align-item-center justify-content-center bg-light text-secondary w-100 my-4 ">
+        class="d-flex align-item-center justify-content-center text-center bg-light text-secondary w-50 my-4 ">
         <h2>点击上传头图</h2>
         <template #loading>
           <div class="d-flex">
@@ -20,7 +20,7 @@
           <div class="uploaded-area">
             <img :src="dataProps.uploadedData && dataProps.uploadedData"
             class="w-50 h-50" >
-            <pre>{{ dataProps.uploadedData }}</pre>
+            <!-- <pre>{{ dataProps.uploadedData }}</pre> -->
             <h3>点击重新上传</h3>
           </div>
         </template>

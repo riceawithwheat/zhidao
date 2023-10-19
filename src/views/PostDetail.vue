@@ -1,14 +1,14 @@
 <template>
     <div class="post-detail-page">
         <modal title="删除文章" :visible="modalIsVisible"
-        @modal-on-close="modalIsVisible = false"
+        @modal-on-close="modalIsVisible === false"
         @modal-on-confirm="hideAndDelete"
         >
         <p>确定要删除这篇文章吗？</p>
         </modal>
         <article class="w-75 mx-auto mb-5 pb-3" v-if="currentPost">
           <!-- <pre>{{ currentPost[0] }}</pre> -->
-        <img :src="currentImageUrl" alt="currentPost.title" class="rounded-lg img-fluid my-4" v-if="currentImageUrl">
+        <img :src="currentImageUrl" alt="currentPost.title" class="rounded-lg img-fluid my-4 " style="width: 300px;" v-if="currentImageUrl">
         <h2 class="mb-4">{{ currentPost[0].title }}</h2>
         <div class="user-profile-component border-top border-bottom py-3">
             <div class="col">
@@ -20,12 +20,12 @@
         </div>
             <div v-html="currentHTML"></div>
             <div v-if="showEditArea" class="btn-group mt-5">
-            <router-link
-             type="button" class="btn btn-success"
-             :to="{name:'create',query: {id: currentPost.id}}">编辑
-            </router-link>
-            <button type="button" class="btn btn-danger" @click.prevent="modalIsVisible = true">删除</button>
-          </div>
+              <router-link
+              type="button" class="btn btn-success"
+              :to="{name:'create',query: {id: currentPost.id}}">编辑
+              </router-link>
+              <button type="button" class="btn btn-danger" @click.prevent="modalIsVisible = true">删除</button>
+            </div>
       </article>
     </div>
 </template>
