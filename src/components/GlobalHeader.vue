@@ -1,7 +1,7 @@
 <template>
-    <nav class="container-fluid navbar navbar-dark bg-primary justify-content-between mb-4 px-4">
+    <nav class="container-fluid navbar navbar-dark bg-primary bg-gradient bg-opacity-55 justify-content-between mb-4 px-4">
       <div class="container">
-        <router-link class="navbar-brand" to="/">者也专栏</router-link>
+        <router-link class="navbar-brand" to="/">learnMore博客</router-link>
         <!-- 当登录之后，不再出现登录样式 -->
         <ul v-if = "!user.isLogin" class="list-inline mb-0">
             <!-- 给登录和注册加上btn样式 -->
@@ -14,7 +14,7 @@
              <dropdown :title="`你好，${user.name}`">
                <dropdown-item><router-link to="/create" class="dropdown-item">新建文章</router-link></dropdown-item>
                <dropdown-item><router-link :to="`/column/${user.columnId}`" class="dropdown-item">我的专栏</router-link></dropdown-item>
-               <dropdown-item><a href="#" class="dropdown-item">编辑资料</a></dropdown-item>
+               <dropdown-item><router-link to="/mine" class="dropdown-item">编辑资料</router-link></dropdown-item>
                <dropdown-item><router-link to="/" class="dropdown-item" @click.prevent = 'handleLogin'>退出登录</router-link></dropdown-item>
               </dropdown>
             </li>
